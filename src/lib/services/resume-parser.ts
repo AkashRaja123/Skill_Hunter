@@ -2,7 +2,6 @@ import { env } from "@/lib/config/env";
 import type { ParsedResumeData, AIAnalysis } from "@/lib/db/types";
 
 const OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions";
-const OPENROUTER_MODEL = "qwen/qwen3-vl-30b-a3b-thinking";
 
 interface OpenRouterResponse {
   choices?: Array<{
@@ -85,8 +84,6 @@ Rules:
 - strengthAreas should highlight what stands out positively
 - improvementAreas should note missing elements or weak points
 - suggestedJobRoles should list 3-5 best-fit roles based on skills and experience
-
-Resume text:
 `;
 
 export async function parseResumeWithOpenRouter(resumeText: string): Promise<{
@@ -103,11 +100,15 @@ export async function parseResumeWithOpenRouter(resumeText: string): Promise<{
         "X-Title": env.openRouterAppName
       },
       body: JSON.stringify({
-        model: OPENROUTER_MODEL,
+        model: env.openRouterModel,
         messages: [
           {
+            role: "system",
+            content: PARSING_PROMPT
+          },
+          {
             role: "user",
-            content: `${PARSING_PROMPT}${resumeText}`
+            content: resumeText
           }
         ],
         temperature: 0.2,

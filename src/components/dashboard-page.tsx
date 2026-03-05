@@ -4,12 +4,16 @@ import Link from "next/link";
 import { useState } from "react";
 
 import { FileUploadBox } from "@/components/file-upload-box";
+import { ResumePreviewModal } from "@/components/resume-preview-modal";
 import { SiteNavbar } from "@/components/site-navbar";
+import type { AIAnalysis, ParsedResumeData } from "@/lib/db/types";
 
 export function DashboardPage() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [uploadedResume, setUploadedResume] = useState<{ id: string; name: string } | null>(null);
+  const [parsedResults, setParsedResults] = useState<{ parsedData: ParsedResumeData; aiAnalysis: AIAnalysis } | null>(null);
+  const [showModal, setShowModal] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const handleFileSelect = async (file: File) => {
@@ -37,6 +41,11 @@ export function DashboardPage() {
         throw new Error(result.error || "Failed to parse resume");
       }
 
+      setParsedResults({
+        parsedData: result.data.parsedData,
+        aiAnalysis: result.data.aiAnalysis
+      });
+
       // Save parsed resume to backend
       const saveResponse = await fetch("/api/resumes", {
         method: "POST",
@@ -60,6 +69,7 @@ export function DashboardPage() {
         id: savedResume.data.resumeId,
         name: file.name
       });
+      setShowModal(true);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to process resume");
       setSelectedFile(null);
@@ -211,55 +221,62 @@ export function DashboardPage() {
             </>
           ) : (
             <div className="space-y-6 text-center">
-              <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-8">
-                <div className="inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-emerald-100">
-                  <svg className="h-8 w-8 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              <div className="rounded-2xl border border-blue-200 bg-blue-50 p-8">
+                <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-blue-100">
+                  <svg className="h-8 w-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                 </div>
-                <h2 className="mt-4 font-heading text-2xl font-bold text-emerald-900">Resume Uploaded!</h2>
-                <p className="mt-2 text-sm text-emerald-800">
-                  {uploadedResume.name} has been successfully uploaded and parsed.
+                <h2 className="font-heading text-2xl font-bold text-blue-900">Analysis Complete!</h2>
+                <p className="mt-2 text-sm text-blue-800">
+                  {uploadedResume.name} has been successfully parsed and analyzed by AI.
                 </p>
+
+                <div className="mt-8">
+                  <button
+                    onClick={() => setShowModal(true)}
+                    className="inline-flex w-full items-center justify-center rounded-xl bg-blue-600 px-6 py-4 text-base font-bold text-white shadow-lg shadow-blue-500/30 transition hover:bg-blue-700 hover:shadow-blue-500/40 md:w-auto"
+                  >
+                    View Parsed Data & Results
+                    <svg className="ml-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                    </svg>
+                  </button>
+                </div>
               </div>
 
-              <div className="space-y-3">
-                <h3 className="font-heading text-lg font-semibold text-slate-900">What&apos;s next?</h3>
-                <p className="text-sm text-slate-600">
-                  Your resume data is now ready. In the next step, you&apos;ll see:
-                </p>
-                <ul className="space-y-2 text-sm text-slate-600">
-                  <li className="flex gap-3 text-left">
-                    <span className="font-semibold text-[var(--primary)]">→</span>
-                    <span>Parsed resume data (skills, experience, education)</span>
+              <div className="rounded-xl border border-slate-200 bg-white p-6 text-left shadow-sm">
+                <h3 className="mb-4 font-heading text-lg font-semibold text-slate-900">What happens next?</h3>
+                <ol className="space-y-4">
+                  <li className="flex gap-4">
+                    <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-blue-100 text-xs font-bold text-blue-600">1</span>
+                    <div>
+                      <p className="text-sm font-semibold text-slate-900">Review Analysis</p>
+                      <p className="text-xs text-slate-600">Check the extracted skills and AI suggestions in the popup.</p>
+                    </div>
                   </li>
-                  <li className="flex gap-3 text-left">
-                    <span className="font-semibold text-[var(--primary)]">→</span>
-                    <span>AI analysis of strengths and improvement areas</span>
+                  <li className="flex gap-4">
+                    <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-slate-100 text-xs font-bold text-slate-500">2</span>
+                    <div>
+                      <p className="text-sm font-semibold text-slate-900">Match Jobs</p>
+                      <p className="text-xs text-slate-600">We'll find opportunities matching your verified skills.</p>
+                    </div>
                   </li>
-                  <li className="flex gap-3 text-left">
-                    <span className="font-semibold text-[var(--primary)]">→</span>
-                    <span>Matched job opportunities sorted by fit score</span>
+                  <li className="flex gap-4">
+                    <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-slate-100 text-xs font-bold text-slate-500">3</span>
+                    <div>
+                      <p className="text-sm font-semibold text-slate-900">Optimize & Apply</p>
+                      <p className="text-xs text-slate-600">Tailor your resume for specific job descriptions.</p>
+                    </div>
                   </li>
-                </ul>
+                </ol>
               </div>
 
-              <button
-                onClick={() => {
-                  setUploadedResume(null);
-                  setSelectedFile(null);
-                }}
-                className="pill inline-flex border border-slate-300 bg-white px-6 py-3 text-sm font-semibold text-slate-800 transition hover:border-slate-900"
-              >
-                Upload Another Resume
-              </button>
-
-              <Link
-                href="/results"
-                className="pill inline-flex bg-[var(--primary)] px-6 py-3 text-sm font-semibold text-white shadow-glow transition hover:brightness-110"
-              >
-                View Parsed Data & Results
-              </Link>
+              <ResumePreviewModal 
+                isOpen={showModal} 
+                onClose={() => setShowModal(false)} 
+                data={parsedResults} 
+              />
             </div>
           )}
         </div>
