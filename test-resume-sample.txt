@@ -1,0 +1,79 @@
+Sarah Chen
+sarah.chen@email.com | +1-555-987-6543 | Austin, TX
+linkedin.com/in/sarahchen | github.com/sarahchen | sarahchen.dev
+
+PROFESSIONAL SUMMARY
+Full Stack Software Engineer with 6+ years of experience building scalable web applications and APIs. Expertise in React, Node.js, Python, and cloud infrastructure. Passionate about clean code, user experience, and team collaboration.
+
+SKILLS
+
+Technical Skills:
+- Frontend: React, TypeScript, Next.js, Vue.js, HTML5, CSS3, Tailwind CSS, Redux
+- Backend: Node.js, Express, Python, Django, FastAPI, RESTful APIs, GraphQL
+- Database: PostgreSQL, MongoDB, Redis, Elasticsearch
+- Cloud & DevOps: AWS (EC2, S3, Lambda), Docker, Kubernetes, CI/CD, GitHub Actions
+- Tools: Git, VS Code, Postman, Jira, Figma
+
+Soft Skills:
+- Agile & SCRUM methodologies
+- Cross-functional team collaboration
+- Technical mentoring and code review
+- Problem-solving and debugging
+- Clear technical communication
+
+PROFESSIONAL EXPERIENCE
+
+Senior Software Engineer | CloudTech Solutions | June 2021 - Present
+- Architected and developed microservices platform serving 500K+ monthly active users
+- Reduced API response time by 60% through database optimization and caching strategies
+- Led migration from monolithic to microservices architecture, improving deployment frequency by 4x
+- Mentored 3 junior engineers and conducted weekly code review sessions
+- Implemented automated testing suite, increasing code coverage from 45% to 92%
+- Collaborated with product and design teams to deliver 15+ major features on schedule
+
+Software Engineer | StartupXYZ | January 2019 - May 2021
+- Built and maintained React-based dashboard application used by 50+ enterprise clients
+- Developed RESTful APIs using Node.js and Express, handling 10M+ requests per day
+- Integrated third-party services including Stripe, SendGrid, and Auth0
+- Improved application performance by 35% through code splitting and lazy loading
+- Participated in on-call rotation and resolved production incidents within SLA
+
+Junior Developer | Tech Innovations Inc | July 2017 - December 2018
+- Contributed to frontend development of e-commerce platform with $2M+ annual revenue
+- Implemented responsive designs achieving 98% cross-browser compatibility
+- Fixed 100+ bugs and implemented 30+ feature enhancements
+- Wrote comprehensive unit tests using Jest and React Testing Library
+
+EDUCATION
+
+Bachelor of Science in Computer Science | University of Texas at Austin | 2017
+GPA: 3.7/4.0
+Relevant Coursework: Data Structures, Algorithms, Database Systems, Web Development, Software Engineering
+
+CERTIFICATIONS
+
+AWS Certified Solutions Architect - Associate | Amazon Web Services | Issued: March 2023
+Valid through: March 2026
+
+Certified Kubernetes Application Developer (CKAD) | Cloud Native Computing Foundation | Issued: September 2022
+Valid through: September 2025
+
+PROJECTS
+
+Task Management SaaS Platform
+- Built full-stack task management application using Next.js, Node.js, and PostgreSQL
+- Implemented real-time collaboration using WebSockets
+- Deployed on AWS with auto-scaling and load balancing
+- Technologies: Next.js, TypeScript, Node.js, PostgreSQL, Redis, Docker, AWS
+- Live Demo: https://taskmanager.sarahchen.dev
+
+Open Source Contributions
+- Contributor to React Hook Form (5 merged PRs)
+- Created npm package "react-easy-toast" with 10K+ weekly downloads
+- Active in Stack Overflow with 2,500+ reputation points
+- GitHub: https://github.com/sarahchen
+
+LANGUAGES
+- English (Native)
+- Mandarin Chinese (Professional working proficiency)
+- Spanish (Basic conversational)
