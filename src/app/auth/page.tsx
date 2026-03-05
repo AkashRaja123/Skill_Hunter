@@ -6,16 +6,18 @@ import Link from "next/link";
 
 import { BrandLogo } from "@/components/brand-logo";
 import { useAuth } from "@/context/auth-context";
+import type { UserRole } from "@/lib/db/types";
 
 export default function AuthPage() {
     const [mode, setMode] = useState<"login" | "signup">("login");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
+    const [selectedRole, setSelectedRole] = useState<UserRole>("job_seeker");
     const [error, setError] = useState("");
     const [busy, setBusy] = useState(false);
 
-    const { signIn, signUp, signInWithGoogle } = useAuth();
+    const { signIn, signUp, signInWithGoogle, setRole } = useAuth();
     const router = useRouter();
 
     async function handleSubmit(e: FormEvent) {
@@ -38,8 +40,9 @@ export default function AuthPage() {
                 await signIn(email, password);
             } else {
                 await signUp(email, password);
+                setRole(selectedRole);
             }
-            router.push("/");
+            router.push("/dashboard");
         } catch (err: unknown) {
             const msg =
                 err instanceof Error ? err.message : "Something went wrong.";
@@ -54,7 +57,10 @@ export default function AuthPage() {
         setBusy(true);
         try {
             await signInWithGoogle();
-            router.push("/");
+            if (mode === "signup") {
+                setRole(selectedRole);
+            }
+            router.push("/dashboard");
         } catch (err: unknown) {
             const msg =
                 err instanceof Error ? err.message : "Something went wrong.";
@@ -157,6 +163,40 @@ export default function AuthPage() {
                                 placeholder="••••••••"
                                 className="w-full rounded-xl border border-[var(--line)] bg-[var(--section)] px-4 py-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/20"
                             />
+                        </div>
+                    )}
+
+                    {mode === "signup" && (
+                        <div>
+                            <label className="mb-1.5 block text-sm font-medium text-slate-700">
+                                I am a…
+                            </label>
+                            <div className="grid grid-cols-2 gap-3">
+                                <button
+                                    type="button"
+                                    onClick={() => setSelectedRole("job_seeker")}
+                                    className={`rounded-xl border-2 px-4 py-3 text-sm font-semibold transition ${
+                                        selectedRole === "job_seeker"
+                                            ? "border-[var(--primary)] bg-blue-50 text-[var(--primary)]"
+                                            : "border-[var(--line)] bg-[var(--section)] text-slate-600 hover:border-slate-300"
+                                    }`}
+                                >
+                                    <span className="block text-lg mb-1">🎯</span>
+                                    Job Seeker
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => setSelectedRole("hr_recruiter")}
+                                    className={`rounded-xl border-2 px-4 py-3 text-sm font-semibold transition ${
+                                        selectedRole === "hr_recruiter"
+                                            ? "border-[var(--primary)] bg-blue-50 text-[var(--primary)]"
+                                            : "border-[var(--line)] bg-[var(--section)] text-slate-600 hover:border-slate-300"
+                                    }`}
+                                >
+                                    <span className="block text-lg mb-1">👥</span>
+                                    HR & Recruiter
+                                </button>
+                            </div>
                         </div>
                     )}
 

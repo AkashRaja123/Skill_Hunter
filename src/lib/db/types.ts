@@ -1,5 +1,6 @@
 export type Id = string;
 export type Timestamp = string;
+export type UserRole = "job_seeker" | "hr_recruiter";
 
 export interface UserMetadata {
   totalResumesUploaded: number;
@@ -11,6 +12,7 @@ export interface User {
   userId: Id;
   email: string;
   displayName: string;
+  role: UserRole;
   createdAt: Timestamp;
   lastLoginAt: Timestamp;
   profileComplete: boolean;

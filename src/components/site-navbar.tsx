@@ -6,18 +6,42 @@ import { useEffect, useState } from "react";
 import { BrandLogo } from "@/components/brand-logo";
 import { useAuth } from "@/context/auth-context";
 
-const links = [
+const publicLinks = [
   { href: "/news", label: "News" },
-  { href: "#features", label: "Features" },
-  { href: "#how-it-works", label: "How It Works" },
-  { href: "#pricing", label: "Pricing" },
-  { href: "#faq", label: "FAQ" },
-  { href: "#contact", label: "Contact" }
+  { href: "/#features", label: "Features" },
+  { href: "/#how-it-works", label: "How It Works" },
+  { href: "/#pricing", label: "Pricing" },
+  { href: "/#faq", label: "FAQ" },
+  { href: "/#contact", label: "Contact" }
+];
+
+const jobSeekerLinks = [
+  { href: "/dashboard", label: "Dashboard" },
+  { href: "/news", label: "News" },
+  { href: "/#features", label: "Features" },
+  { href: "/#how-it-works", label: "How It Works" },
+  { href: "/#pricing", label: "Pricing" },
+  { href: "/#faq", label: "FAQ" },
+  { href: "/#contact", label: "Contact" }
+];
+
+const hrLinks = [
+  { href: "/dashboard", label: "Dashboard" },
+  { href: "/news", label: "News" },
+  { href: "/#features", label: "Features" },
+  { href: "/#how-it-works", label: "How It Works" },
+  { href: "/#pricing", label: "Pricing" },
+  { href: "/#faq", label: "FAQ" },
+  { href: "/#contact", label: "Contact" }
 ];
 
 export function SiteNavbar() {
   const [isScrolled, setIsScrolled] = useState(false);
-  const { user, loading, signOut } = useAuth();
+  const { user, loading, role, signOut } = useAuth();
+
+  const links = !loading && user
+    ? role === "hr_recruiter" ? hrLinks : jobSeekerLinks
+    : publicLinks;
 
   useEffect(() => {
     const onScroll = () => setIsScrolled(window.scrollY > 10);
@@ -47,12 +71,9 @@ export function SiteNavbar() {
           ))}
           {!loading && user ? (
             <div className="flex items-center gap-4">
-              <Link
-                href="/dashboard"
-                className="text-sm font-medium text-slate-700 transition hover:text-slate-950"
-              >
-                Dashboard
-              </Link>
+              <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
+                {role === "hr_recruiter" ? "HR & Recruiter" : "Job Seeker"}
+              </span>
               <button
                 type="button"
                 onClick={() => signOut()}

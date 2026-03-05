@@ -17,10 +17,13 @@ import {
     type User
 } from "firebase/auth";
 import { auth } from "@/lib/firebase/config";
+import type { UserRole } from "@/lib/db/types";
 
 interface AuthContextValue {
     user: User | null;
     loading: boolean;
+    role: UserRole | null;
+    setRole: (role: UserRole) => void;
     signIn: (email: string, password: string) => Promise<void>;
     signUp: (email: string, password: string) => Promise<void>;
     signInWithGoogle: () => Promise<void>;
@@ -32,14 +35,30 @@ const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
     const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState(true);
+    const [role, setRoleState] = useState<UserRole | null>(null);
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (u) => {
             setUser(u);
+            if (u) {
+                const saved = localStorage.getItem(`role_${u.uid}`);
+                if (saved === "job_seeker" || saved === "hr_recruiter") {
+                    setRoleState(saved);
+                }
+            } else {
+                setRoleState(null);
+            }
             setLoading(false);
         });
         return unsubscribe;
     }, []);
+
+    function setRole(r: UserRole) {
+        setRoleState(r);
+        if (user) {
+            localStorage.setItem(`role_${user.uid}`, r);
+        }
+    }
 
     async function signIn(email: string, password: string) {
         await signInWithEmailAndPassword(auth, email, password);
@@ -56,11 +75,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     async function signOut() {
         await firebaseSignOut(auth);
+        setRoleState(null);
     }
 
     return (
         <AuthContext.Provider
-            value={{ user, loading, signIn, signUp, signInWithGoogle, signOut }}
+            value={{ user, loading, role, setRole, signIn, signUp, signInWithGoogle, signOut }}
         >
             {children}
         </AuthContext.Provider>

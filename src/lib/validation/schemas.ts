@@ -173,6 +173,7 @@ export const createUserSchema = z.object({
   userId: z.string().min(1),
   email: z.string().email(),
   displayName: z.string().min(1),
+  role: z.enum(["job_seeker", "hr_recruiter"]).default("job_seeker"),
   profileComplete: z.boolean().default(false)
 });
 

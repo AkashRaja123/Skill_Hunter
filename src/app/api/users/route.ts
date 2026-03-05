@@ -26,6 +26,7 @@ export async function POST(req: NextRequest) {
       userId: input.userId,
       email: input.email,
       displayName: input.displayName,
+      role: input.role,
       createdAt: nowIso(),
       lastLoginAt: nowIso(),
       profileComplete: input.profileComplete,
