@@ -27,9 +27,8 @@ export function SiteNavbar() {
 
   return (
     <header
-      className={`sticky top-0 z-50 transition-all ${
-        isScrolled ? "bg-white/92 shadow-lg backdrop-blur border-b border-slate-100" : "bg-transparent"
-      }`}
+      className={`sticky top-0 z-50 transition-all ${isScrolled ? "bg-white/92 shadow-lg backdrop-blur border-b border-slate-100" : "bg-transparent"
+        }`}
     >
       <nav className="container-shell flex h-20 items-center justify-between gap-4">
         <Link href="/" className="inline-flex items-center">
