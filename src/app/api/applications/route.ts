@@ -4,7 +4,7 @@ import { ok } from "@/lib/api/http";
 import { parseBody, routeError } from "@/lib/api/route-helpers";
 import { getDataSource } from "@/lib/db";
 import { createId, nowIso } from "@/lib/utils/id";
-import { createApplicationSchema } from "@/lib/validation/schemas";
+import { createApplicationSchema, updateApplicationSchema, bulkUpdateApplicationSchema } from "@/lib/validation/schemas";
 
 export async function GET(req: NextRequest) {
   try {
@@ -37,6 +37,65 @@ export async function POST(req: NextRequest) {
     });
 
     return ok(created, 201);
+  } catch (error) {
+    return routeError(error);
+  }
+}
+
+export async function PATCH(req: NextRequest) {
+  try {
+    const body = await parseBody(req);
+    const input = updateApplicationSchema.parse(body);
+    const ds = getDataSource();
+    const now = nowIso();
+
+    const updates: Record<string, unknown> = {};
+
+    if (input.applicationStatus) {
+      updates.applicationStatus = input.applicationStatus;
+      // Fetch current to append statusHistory
+      const current = (await ds.listApplications()). find(a => a.applicationId === input.applicationId);
+      if (current) {
+        updates.statusHistory = [
+          ...current.statusHistory,
+          { status: input.applicationStatus, updatedAt: now, notes: input.notes }
+        ];
+      }
+    }
+
+    if (input.notes !== undefined) updates.notes = input.notes;
+    if (input.followUpDate !== undefined) updates.followUpDate = input.followUpDate;
+    if (input.interviewDetails !== undefined) updates.interviewDetails = input.interviewDetails;
+
+    const updated = await ds.updateApplication(input.applicationId, updates);
+    return ok(updated);
+  } catch (error) {
+    return routeError(error);
+  }
+}
+
+export async function PUT(req: NextRequest) {
+  try {
+    const body = await parseBody(req);
+    const input = bulkUpdateApplicationSchema.parse(body);
+    const ds = getDataSource();
+    const now = nowIso();
+
+    const results = await Promise.all(
+      input.applicationIds.map(async (id) => {
+        const current = (await ds.listApplications()).find(a => a.applicationId === id);
+        const statusHistory = current
+          ? [...current.statusHistory, { status: input.applicationStatus, updatedAt: now }]
+          : [{ status: input.applicationStatus, updatedAt: now }];
+
+        return ds.updateApplication(id, {
+          applicationStatus: input.applicationStatus,
+          statusHistory
+        });
+      })
+    );
+
+    return ok(results);
   } catch (error) {
     return routeError(error);
   }

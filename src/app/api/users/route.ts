@@ -27,6 +27,7 @@ export async function POST(req: NextRequest) {
       email: input.email,
       displayName: input.displayName,
       role: input.role,
+      isJobSeeker: input.role !== "hr_recruiter",
       createdAt: nowIso(),
       lastLoginAt: nowIso(),
       profileComplete: input.profileComplete,

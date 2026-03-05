@@ -1,4 +1,11 @@
 import type { DataSource } from "@/lib/db/data-source";
+import {
+  dummyApplications,
+  dummyATSScores,
+  dummyJobMatches,
+  dummyResumes,
+  dummyUsers
+} from "@/lib/db/dummy-data";
 import type {
   Application,
   ATSScore,
@@ -9,13 +16,16 @@ import type {
   User
 } from "@/lib/db/types";
 
-function filterBy<T extends Record<string, unknown>>(items: T[], filters?: ListFilters): T[] {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function filterBy<T>(items: T[], filters?: ListFilters): T[] {
   if (!filters) return items;
   return items.filter((item) => {
-    if (filters.userId && item.userId !== filters.userId) return false;
-    if (filters.resumeId && item.resumeId !== filters.resumeId) return false;
-    if (filters.jobMatchId && item.jobMatchId !== filters.jobMatchId) return false;
-    if (filters.status && item.status !== filters.status && item.applicationStatus !== filters.status) return false;
+    const rec = item as Record<string, unknown>;
+    if (filters.userId && rec["userId"] !== filters.userId) return false;
+    if (filters.resumeId && rec["resumeId"] !== filters.resumeId) return false;
+    if (filters.jobMatchId && rec["jobMatchId"] !== filters.jobMatchId) return false;
+    if (filters.status && rec["status"] !== filters.status && rec["applicationStatus"] !== filters.status) return false;
+    if (filters.email && rec["email"] !== filters.email) return false;
     return true;
   });
 }
@@ -27,6 +37,32 @@ export class InMemoryDataSource implements DataSource {
   private readonly atsScores = new Map<string, ATSScore>();
   private readonly resumeModifications = new Map<string, ResumeModification>();
   private readonly applications = new Map<string, Application>();
+
+  constructor() {
+    this.seedDefaults();
+  }
+
+  private seedDefaults() {
+    for (const user of dummyUsers) {
+      this.users.set(user.userId, user);
+    }
+
+    for (const resume of dummyResumes) {
+      this.resumes.set(resume.resumeId, resume);
+    }
+
+    for (const jobMatch of dummyJobMatches) {
+      this.jobMatches.set(jobMatch.jobMatchId, jobMatch);
+    }
+
+    for (const atsScore of dummyATSScores) {
+      this.atsScores.set(atsScore.atsScoreId, atsScore);
+    }
+
+    for (const application of dummyApplications) {
+      this.applications.set(application.applicationId, application);
+    }
+  }
 
   async listUsers(filters?: ListFilters): Promise<User[]> {
     return filterBy(Array.from(this.users.values()), filters);
@@ -85,5 +121,13 @@ export class InMemoryDataSource implements DataSource {
   async createApplication(input: Application): Promise<Application> {
     this.applications.set(input.applicationId, input);
     return input;
+  }
+
+  async updateApplication(applicationId: string, updates: Partial<Application>): Promise<Application> {
+    const existing = this.applications.get(applicationId);
+    if (!existing) throw new Error(`Application ${applicationId} not found`);
+    const updated = { ...existing, ...updates, applicationId: existing.applicationId };
+    this.applications.set(applicationId, updated);
+    return updated;
   }
 }

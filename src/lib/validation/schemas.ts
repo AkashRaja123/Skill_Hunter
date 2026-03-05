@@ -286,6 +286,27 @@ export const createApplicationSchema = z.object({
   followUpDate: isoDate.optional()
 });
 
+export const updateApplicationSchema = z.object({
+  applicationId: z.string().min(1),
+  applicationStatus: z.enum(["applied", "screening", "interview", "offer", "rejected", "accepted", "declined"]).optional(),
+  notes: z.string().optional(),
+  followUpDate: isoDate.optional(),
+  interviewDetails: z.array(
+    z.object({
+      round: z.number().int().positive(),
+      type: z.enum(["phone", "technical", "behavioral", "final"]),
+      scheduledAt: isoDate,
+      completedAt: isoDate.optional(),
+      feedback: z.string().optional()
+    })
+  ).optional()
+});
+
+export const bulkUpdateApplicationSchema = z.object({
+  applicationIds: z.array(z.string().min(1)).min(1),
+  applicationStatus: z.enum(["applied", "screening", "interview", "offer", "rejected", "accepted", "declined"])
+});
+
 export const predictJobsSchema = z.object({
   role: z.string().min(1),
   location: z.string().optional()

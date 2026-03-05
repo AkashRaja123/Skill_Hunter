@@ -26,4 +26,5 @@ export interface DataSource {
 
   listApplications(filters?: ListFilters): Promise<Application[]>;
   createApplication(input: Application): Promise<Application>;
+  updateApplication(applicationId: string, updates: Partial<Application>): Promise<Application>;
 }

@@ -39,8 +39,7 @@ export default function AuthPage() {
             if (mode === "login") {
                 await signIn(email, password);
             } else {
-                await signUp(email, password);
-                setRole(selectedRole);
+                await signUp(email, password, selectedRole);
             }
             router.push("/dashboard");
         } catch (err: unknown) {
@@ -56,10 +55,7 @@ export default function AuthPage() {
         setError("");
         setBusy(true);
         try {
-            await signInWithGoogle();
-            if (mode === "signup") {
-                setRole(selectedRole);
-            }
+            await signInWithGoogle(mode === "signup" ? selectedRole : undefined);
             router.push("/dashboard");
         } catch (err: unknown) {
             const msg =

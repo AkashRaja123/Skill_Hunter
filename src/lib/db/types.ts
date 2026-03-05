@@ -13,6 +13,7 @@ export interface User {
   email: string;
   displayName: string;
   role: UserRole;
+  isJobSeeker: boolean;
   createdAt: Timestamp;
   lastLoginAt: Timestamp;
   profileComplete: boolean;
@@ -241,4 +242,5 @@ export interface ListFilters {
   resumeId?: string;
   jobMatchId?: string;
   status?: string;
+  email?: string;
 }

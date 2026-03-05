@@ -9,6 +9,7 @@ const envSchema = z.object({
   OPENROUTER_APP_NAME: z.string().optional(),
   ADZUNA_APP_ID: z.string().min(1, "ADZUNA_APP_ID is required for job search"),
   ADZUNA_APP_KEY: z.string().min(1, "ADZUNA_APP_KEY is required for job search"),
+  NEWS_API_KEY: z.string().optional(),
   FIREBASE_PROJECT_ID: z.string().optional(),
   FIREBASE_CLIENT_EMAIL: z.string().optional(),
   FIREBASE_PRIVATE_KEY: z.string().optional(),
@@ -30,5 +31,6 @@ export const env = {
   openRouterSiteUrl: parsed.data.OPENROUTER_SITE_URL,
   openRouterAppName: parsed.data.OPENROUTER_APP_NAME ?? "Skill Hunter",
   adzunaAppId: parsed.data.ADZUNA_APP_ID,
-  adzunaAppKey: parsed.data.ADZUNA_APP_KEY
+  adzunaAppKey: parsed.data.ADZUNA_APP_KEY,
+  newsApiKey: parsed.data.NEWS_API_KEY
 };
