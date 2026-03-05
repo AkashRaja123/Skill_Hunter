@@ -11,11 +11,9 @@ flowchart TD
     Auth -->|Yes| Dashboard[Dashboard]
     
     Dashboard --> Upload[Upload Resume]
-    Upload --> StoreFile[(Store in Firebase Storage)]
-    StoreFile --> CreateResume[(Create Resume Document<br/>status: 'parsing')]
-    CreateResume --> ParseResume[AI Resume Parser]
+    Upload --> ParseResume[AI Resume Parser]
     
-    ParseResume --> UpdateResume[(Update Resume Document<br/>with parsedData<br/>status: 'parsed')]
+    ParseResume --> CreateResume[(Create Resume Document<br/>with parsedData)]
     UpdateResume --> AIAnalysis[AI Analysis:<br/>- Strength Areas<br/>- Improvement Areas<br/>- Suggested Roles]
     
     AIAnalysis --> FetchJobs[Fetch Jobs from<br/>DeepSeek-AI & Brave MCP]
@@ -37,8 +35,7 @@ flowchart TD
     ShowSuggestions --> ModifyResume[Modify Resume:<br/>- Rephrase content<br/>- Add keywords<br/>- Adjust format]
     
     ModifyResume --> CreateMod[(Create Modification Document<br/>with changes)]
-    CreateMod --> SaveModified[(Save Modified Resume<br/>to Storage)]
-    SaveModified --> RecalcATS[Recalculate ATS Score<br/>version: n+1]
+    CreateMod --> RecalcATS[Recalculate ATS Score<br/>version: n+1]
     
     RecalcATS --> StoreNewATS[(Store New ATS Score<br/>with improvement delta)]
     StoreNewATS --> CheckScore
@@ -63,25 +60,16 @@ flowchart TD
 
 ```mermaid
 flowchart LR
-    A[Resume Upload] --> B[Firebase Storage]
-    B --> C{File Type Valid?}
-    C -->|No| D[Error: Invalid Format]
-    C -->|Yes| E[Create Resume Doc]
+    A[Resume Upload] --> B[Extract Text]
+    B --> C[Parse Sections:<br/>- Personal Info<br/>- Skills<br/>- Experience<br/>- Education<br/>- Certifications<br/>- Projects]
     
-    E --> F[Status: 'parsing']
-    F --> G[Extract Text]
-    G --> H[Parse Sections:<br/>- Personal Info<br/>- Skills<br/>- Experience<br/>- Education<br/>- Certifications<br/>- Projects]
-    
-    H --> I[AI Analysis]
-    I --> J[Update Resume Doc]
-    J --> K[Status: 'parsed']
-    K --> L[Ready for Job Matching]
+    C --> D[AI Analysis]
+    D --> E[Create Resume Doc<br/>with parsedData]
+    E --> F[Ready for Job Matching]
     
     style A fill:#e3f2fd
-    style B fill:#fff9c4
     style E fill:#c8e6c9
-    style K fill:#90ee90
-    style D fill:#ffcdd2
+    style F fill:#90ee90
 ```
 
 ---

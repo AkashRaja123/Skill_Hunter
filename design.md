@@ -46,11 +46,8 @@ Stores parsed resume data and file references.
 {
   resumeId: string,            // Auto-generated
   userId: string,              // Reference to user
-  fileName: string,
-  fileUrl: string,             // Firebase Storage URL
   uploadedAt: timestamp,
   lastModifiedAt: timestamp,
-  status: string,              // 'uploaded', 'parsing', 'parsed', 'error'
   
   // Parsed resume data
   parsedData: {
@@ -257,9 +254,6 @@ Tracks changes made to resumes for specific jobs.
   // Modified resume data (same structure as parsedData in Resumes)
   modifiedResumeData: { /* same as parsedData */ },
   
-  // Storage reference for modified resume file
-  modifiedFileUrl: string,
-  
   status: string               // 'draft', 'finalized', 'applied'
 }
 ```
@@ -316,29 +310,14 @@ Tracks job applications and their status.
 
 ---
 
-## Firebase Storage Structure
-
-```
-/users/{userId}/
-  /resumes/
-    /original/
-      {resumeId}_original.pdf
-    /modified/
-      {modificationId}_modified.pdf
-```
-
----
-
 ## Data Flow & Sorting Strategies
 
 ### 1. Resume Upload Flow
 ```
-1. User uploads resume → Store in Firebase Storage
+1. User uploads resume → Parse resume (AI/backend service)
 2. Create document in /users/{userId}/resumes/{resumeId}
-3. Set status: 'parsing'
-4. Parse resume (AI/backend service)
-5. Update document with parsedData
-6. Set status: 'parsed'
+3. Store parsedData in document
+4. Set uploadedAt timestamp
 ```
 
 ### 2. Job Matching Flow
