@@ -1,8 +1,22 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { useEffect, useRef, useState } from "react";
 import type { ParsedResumeData, AIAnalysis } from "@/lib/db/types";
-import { JobMatchingWizard } from "./job-matching-wizard";
+
+// JobMatchingWizard triggers multi-step API calls (job search + ATS scoring).
+// Lazy-load so its bundle is only fetched when the user opens the roles modal.
+const JobMatchingWizard = dynamic(
+  () => import("./job-matching-wizard").then((m) => ({ default: m.JobMatchingWizard })),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="flex h-64 items-center justify-center text-sm text-slate-500">
+        Loading wizard…
+      </div>
+    ),
+  }
+);
 
 interface ResumePreviewModalProps {
   isOpen: boolean;

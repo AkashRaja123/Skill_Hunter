@@ -1,13 +1,21 @@
 "use client";
 
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import { useCallback, useEffect, useMemo, useState, useRef } from "react";
 
 import { SiteNavbar } from "@/components/site-navbar";
 import { HRPipelineBoard } from "@/components/hr-pipeline-board";
 import { HRCandidateDrawer } from "@/components/hr-candidate-drawer";
 import { HRCandidateTable } from "@/components/hr-candidate-table";
-import { HRAnalyticsView } from "@/components/hr-analytics-view";
+import { TabPanelSkeleton } from "@/components/loading-skeletons";
+
+// HRAnalyticsView includes D3 charts and heavy visualisations — lazy-load it
+// so its bundle is only fetched when the user clicks the "Analytics" tab.
+const HRAnalyticsView = dynamic(
+  () => import("@/components/hr-analytics-view").then((m) => ({ default: m.HRAnalyticsView })),
+  { ssr: false, loading: () => <TabPanelSkeleton /> }
+);
 import type {
   Application,
   ApplicationStatusEvent,

@@ -1,12 +1,20 @@
 "use client";
 
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import { useState } from "react";
 
 import { FileUploadBox } from "@/components/file-upload-box";
-import { ResumePreviewModal } from "@/components/resume-preview-modal";
+import { ModalSkeleton } from "@/components/loading-skeletons";
 import { SiteNavbar } from "@/components/site-navbar";
 import type { AIAnalysis, ParsedResumeData } from "@/lib/db/types";
+
+// ResumePreviewModal is a large component (contains the Job Matching Wizard).
+// Lazy-load it — the bundle is only fetched when the user has uploaded a resume.
+const ResumePreviewModal = dynamic(
+  () => import("@/components/resume-preview-modal").then((m) => ({ default: m.ResumePreviewModal })),
+  { ssr: false, loading: () => <ModalSkeleton /> }
+);
 
 export function DashboardPage() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
