@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { ParsedResumeData, AIAnalysis } from "@/lib/db/types";
+import { JobMatchingWizard } from "./job-matching-wizard";
 
 interface ResumePreviewModalProps {
   isOpen: boolean;
@@ -14,6 +15,9 @@ interface ResumePreviewModalProps {
 
 export function ResumePreviewModal({ isOpen, onClose, data }: ResumePreviewModalProps) {
   const modalRef = useRef<HTMLDivElement>(null);
+  const [showRolesModal, setShowRolesModal] = useState(false);
+  const [selectedRole, setSelectedRole] = useState<string | null>(null);
+  const [showWizard, setShowWizard] = useState(false);
 
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
@@ -79,16 +83,16 @@ export function ResumePreviewModal({ isOpen, onClose, data }: ResumePreviewModal
                 </div>
               </div>
 
-              {/* Suggestions */}
+              {/* Match Job Button */}
               <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-                <h3 className="mb-3 font-semibold text-slate-900">Suggested Roles</h3>
-                <div className="flex flex-wrap gap-2">
-                  {aiAnalysis.suggestedJobRoles.map((role, i) => (
-                    <span key={i} className="rounded-full bg-indigo-50 px-3 py-1 text-xs font-medium text-indigo-700">
-                      {role}
-                    </span>
-                  ))}
-                </div>
+                <h3 className="mb-3 font-semibold text-slate-900">Job Matches</h3>
+                <p className="mb-3 text-xs text-slate-500">Find roles that match your profile.</p>
+                <button
+                  onClick={() => setShowRolesModal(true)}
+                  className="w-full rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700 shadow-sm shadow-indigo-500/20 transition-all active:scale-[0.98]"
+                >
+                  Match Job
+                </button>
               </div>
 
               {/* Strengths & Weaknesses */}
@@ -239,6 +243,82 @@ export function ResumePreviewModal({ isOpen, onClose, data }: ResumePreviewModal
           </button>
         </div>
       </div>
+
+      {/* Suggested Roles Modal */}
+      {showRolesModal && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-slate-900/60 p-4 backdrop-blur-md">
+          <div className="w-full max-w-md overflow-hidden rounded-2xl bg-white shadow-2xl animate-in zoom-in-95 fade-in duration-200">
+            <div className="border-b border-slate-100 bg-white px-6 py-4 flex justify-between items-center">
+              <h3 className="text-lg font-bold text-slate-900">Suggested Roles</h3>
+              <button 
+                onClick={() => setShowRolesModal(false)} 
+                className="text-slate-400 hover:text-slate-600 transition-colors"
+                aria-label="Close modal"
+              >
+                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <div className="p-6 max-h-[60vh] overflow-y-auto">
+              <p className="mb-4 text-sm text-slate-600">Select a role to check for job matches:</p>
+              <div className="flex flex-col gap-2">
+                {aiAnalysis.suggestedJobRoles.length > 0 ? (
+                  aiAnalysis.suggestedJobRoles.map((role, i) => (
+                    <button
+                      key={i}
+                      onClick={() => setSelectedRole(role)}
+                      className={`relative flex items-center justify-between rounded-lg border px-4 py-3 text-left text-sm font-medium transition-all ${
+                        selectedRole === role
+                          ? 'border-indigo-600 bg-indigo-50 text-indigo-700 ring-1 ring-indigo-600'
+                          : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50'
+                      }`}
+                    >
+                      <span>{role}</span>
+                      {selectedRole === role && (
+                        <svg className="h-5 w-5 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        </svg>
+                      )}
+                    </button>
+                  ))
+                ) : (
+                  <p className="text-sm text-slate-400 italic">No roles suggested.</p>
+                )}
+              </div>
+            </div>
+            <div className="border-t border-slate-100 bg-slate-50 px-6 py-4 flex justify-end gap-3">
+               <button
+                 onClick={() => setShowRolesModal(false)}
+                 className="rounded-lg px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 transition-colors"
+               >
+                 Cancel
+               </button>
+               <button
+                 disabled={!selectedRole}
+                 onClick={() => {
+                   setShowRolesModal(false);
+                   setShowWizard(true);
+                 }}
+                 className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm shadow-indigo-500/20 transition-all active:scale-[0.98]"
+               >
+                 Proceed
+               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Job Matching Wizard */}
+      {selectedRole && (
+        <JobMatchingWizard
+          isOpen={showWizard}
+          onClose={() => setShowWizard(false)}
+          selectedRole={selectedRole}
+          parsedData={parsedData}
+          aiAnalysis={aiAnalysis}
+        />
+      )}
     </div>
   );
 }

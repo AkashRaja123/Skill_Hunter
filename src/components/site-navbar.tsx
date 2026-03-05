@@ -7,6 +7,7 @@ import { BrandLogo } from "@/components/brand-logo";
 import { useAuth } from "@/context/auth-context";
 
 const links = [
+  { href: "/news", label: "News" },
   { href: "#features", label: "Features" },
   { href: "#how-it-works", label: "How It Works" },
   { href: "#pricing", label: "Pricing" },
@@ -70,19 +71,35 @@ export function SiteNavbar() {
           )}
         </div>
         {!loading && user ? (
-          <Link
-            href="/dashboard"
-            className="pill bg-[var(--primary)] px-4 py-2 text-sm font-semibold text-white md:hidden"
-          >
-            Dashboard
-          </Link>
+          <div className="flex items-center gap-2 md:hidden">
+            <Link
+              href="/news"
+              className="pill border border-[var(--line)] bg-white px-4 py-2 text-sm font-semibold text-slate-700"
+            >
+              News
+            </Link>
+            <Link
+              href="/dashboard"
+              className="pill bg-[var(--primary)] px-4 py-2 text-sm font-semibold text-white"
+            >
+              Dashboard
+            </Link>
+          </div>
         ) : (
-          <Link
-            href="/auth"
-            className="pill bg-[var(--primary)] px-4 py-2 text-sm font-semibold text-white md:hidden"
-          >
-            Start
-          </Link>
+          <div className="flex items-center gap-2 md:hidden">
+            <Link
+              href="/news"
+              className="pill border border-[var(--line)] bg-white px-4 py-2 text-sm font-semibold text-slate-700"
+            >
+              News
+            </Link>
+            <Link
+              href="/auth"
+              className="pill bg-[var(--primary)] px-4 py-2 text-sm font-semibold text-white"
+            >
+              Start
+            </Link>
+          </div>
         )}
       </nav>
     </header>

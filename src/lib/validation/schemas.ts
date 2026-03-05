@@ -284,3 +284,16 @@ export const createApplicationSchema = z.object({
   notes: z.string().optional(),
   followUpDate: isoDate.optional()
 });
+
+export const predictJobsSchema = z.object({
+  role: z.string().min(1),
+  location: z.string().optional()
+});
+
+export const analyzeAtsSchema = z.object({
+  parsedData: parsedResumeDataSchema,
+  jobTitle: z.string().min(1),
+  jobDescription: z.string().min(1),
+  resumeId: z.string().optional(),
+  userId: z.string().optional()
+});

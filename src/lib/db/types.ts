@@ -194,6 +194,46 @@ export interface Application {
   followUpDate?: Timestamp;
 }
 
+export interface JobSearchResult {
+  id: string;
+  title: string;
+  company: string;
+  location: string;
+  description: string;
+  salaryMin?: number;
+  salaryMax?: number;
+  jobType?: string;
+  jobUrl?: string;
+  postedDate?: string;
+}
+
+export interface MissingSkill {
+  skill: string;
+  importance: "critical" | "recommended" | "nice-to-have";
+}
+
+export interface ATSAnalysisResult {
+  score: number;
+  passedThreshold: boolean;
+  scoreBreakdown: {
+    keywordMatch: number;
+    formatCompliance: number;
+    experienceMatch: number;
+    skillsMatch: number;
+    educationMatch: number;
+  };
+  suggestions: ATSSuggestion[];
+  resumeEnhancement: {
+    keywordsToAdd: string[];
+    phrasesToUse: string[];
+    sectionsToUpdate: string[];
+  };
+  skillsGap: {
+    missingSkills: MissingSkill[];
+    timeToLearn?: string;
+  };
+}
+
 export interface ListFilters {
   userId?: string;
   resumeId?: string;
