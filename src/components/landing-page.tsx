@@ -1,5 +1,7 @@
 import Link from "next/link";
 
+import { BrandLogo } from "@/components/brand-logo";
+
 const logos = ["PixelFrame", "StackLabs", "CloudNest", "Northway", "LoopGrid", "SprintOS"];
 
 const testimonials = [
@@ -339,7 +341,7 @@ export function LandingPage() {
 
       <footer id="contact" className="border-t border-slate-200 bg-white py-8">
         <div className="container-shell flex flex-col gap-4 text-sm text-slate-600 md:flex-row md:items-center md:justify-between">
-          <p className="font-semibold text-slate-900">[Your Logo Here]</p>
+          <BrandLogo />
           <p>Copyright 2026 Skill Hunter. All rights reserved.</p>
           <div className="flex flex-wrap gap-4">
             <Link href="#">Privacy Policy</Link>

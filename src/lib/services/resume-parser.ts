@@ -1,16 +1,15 @@
 import { env } from "@/lib/config/env";
 import type { ParsedResumeData, AIAnalysis } from "@/lib/db/types";
 
-const GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent";
+const OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions";
+const OPENROUTER_MODEL = "qwen/qwen3-vl-30b-a3b-thinking";
 
-interface GeminiResponse {
-  candidates?: {
-    content: {
-      parts: {
-        text: string;
-      }[];
+interface OpenRouterResponse {
+  choices?: Array<{
+    message?: {
+      content?: string;
     };
-  }[];
+  }>;
 }
 
 const PARSING_PROMPT = `You are an expert resume parser. Extract structured data from the following resume text and return ONLY a valid JSON object with this exact structure:
@@ -90,45 +89,43 @@ Rules:
 Resume text:
 `;
 
-export async function parseResumeWithGemini(resumeText: string): Promise<{
+export async function parseResumeWithOpenRouter(resumeText: string): Promise<{
   parsedData: ParsedResumeData;
   aiAnalysis: AIAnalysis;
 }> {
   try {
-    const response = await fetch(`${GEMINI_API_URL}?key=${env.geminiApiKey}`, {
+    const response = await fetch(OPENROUTER_API_URL, {
       method: "POST",
       headers: {
-        "Content-Type": "application/json"
+        Authorization: `Bearer ${env.openRouterApiKey}`,
+        "Content-Type": "application/json",
+        "HTTP-Referer": env.openRouterSiteUrl ?? "http://localhost:3000",
+        "X-Title": env.openRouterAppName
       },
       body: JSON.stringify({
-        contents: [
+        model: OPENROUTER_MODEL,
+        messages: [
           {
-            parts: [
-              {
-                text: PARSING_PROMPT + resumeText
-              }
-            ]
+            role: "user",
+            content: `${PARSING_PROMPT}${resumeText}`
           }
         ],
-        generationConfig: {
-          temperature: 0.2,
-          topK: 40,
-          topP: 0.95,
-          maxOutputTokens: 8192
-        }
+        temperature: 0.2,
+        top_p: 0.95,
+        max_tokens: 4096
       })
     });
 
     if (!response.ok) {
       const errorData = await response.json();
-      throw new Error(`Gemini API error: ${JSON.stringify(errorData)}`);
+      throw new Error(`OpenRouter API error: ${JSON.stringify(errorData)}`);
     }
 
-    const data: GeminiResponse = await response.json();
-    const generatedText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+    const data: OpenRouterResponse = await response.json();
+    const generatedText = data.choices?.[0]?.message?.content;
 
     if (!generatedText) {
-      throw new Error("No response from Gemini API");
+      throw new Error("No response from OpenRouter API");
     }
 
     // Extract JSON from markdown code blocks if present

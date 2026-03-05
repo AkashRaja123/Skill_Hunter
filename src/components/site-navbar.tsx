@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
+import { BrandLogo } from "@/components/brand-logo";
+
 const links = [
   { href: "#features", label: "Features" },
   { href: "#how-it-works", label: "How It Works" },
@@ -28,8 +30,8 @@ export function SiteNavbar() {
       }`}
     >
       <nav className="container-shell flex h-20 items-center justify-between gap-4">
-        <Link href="/" className="font-heading text-lg font-semibold tracking-tight">
-          [Your Logo Here]
+        <Link href="/" className="inline-flex items-center">
+          <BrandLogo />
         </Link>
         <div className="hidden items-center gap-8 md:flex">
           {links.map((item) => (

@@ -2,7 +2,7 @@ import type { NextRequest } from "next/server";
 
 import { ok, fail } from "@/lib/api/http";
 import { routeError } from "@/lib/api/route-helpers";
-import { parseResumeWithGemini, extractTextFromPDF } from "@/lib/services/resume-parser";
+import { parseResumeWithOpenRouter, extractTextFromPDF } from "@/lib/services/resume-parser";
 
 export async function POST(req: NextRequest) {
   try {
@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    const result = await parseResumeWithGemini(textToProcess);
+    const result = await parseResumeWithOpenRouter(textToProcess);
 
     return ok(result, 200);
   } catch (error) {

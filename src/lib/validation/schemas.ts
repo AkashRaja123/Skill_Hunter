@@ -2,57 +2,171 @@ import { z } from "zod";
 
 const isoDate = z.string().datetime().or(z.string().min(1));
 
+const cleanOptionalString = z.preprocess(
+  (value) => (typeof value === "string" ? value.trim() : value),
+  z.string().optional()
+);
+
+const optionalUrl = z.preprocess(
+  (value) => (typeof value === "string" && value.trim() === "" ? undefined : value),
+  z.string().url().optional()
+);
+
+const stringList = z.preprocess(
+  (value) => {
+    if (Array.isArray(value)) {
+      return value
+        .map((item) => String(item).trim())
+        .filter(Boolean);
+    }
+
+    if (typeof value === "string") {
+      return value
+        .split(/[\n,;]+/)
+        .map((item) => item.trim())
+        .filter(Boolean);
+    }
+
+    return [];
+  },
+  z.array(z.string())
+);
+
+const proficiencySchema = z.preprocess((value) => {
+  if (typeof value !== "string") {
+    return "intermediate";
+  }
+
+  const normalized = value.toLowerCase().trim();
+  if (["expert", "advanced", "senior", "proficient"].some((token) => normalized.includes(token))) {
+    return "expert";
+  }
+
+  if (["beginner", "basic", "novice", "entry"].some((token) => normalized.includes(token))) {
+    return "beginner";
+  }
+
+  return "intermediate";
+}, z.enum(["beginner", "intermediate", "expert"]));
+
+const scoreSchema = z.preprocess((value) => {
+  if (typeof value === "number") {
+    return value;
+  }
+
+  if (typeof value === "string") {
+    const match = value.match(/\d+/);
+    return match ? Number(match[0]) : 0;
+  }
+
+  return 0;
+}, z.number().min(0).max(100));
+
 const parsedResumeDataSchema = z.object({
   personalInfo: z.object({
-    name: z.string().min(1),
-    email: z.string().email(),
-    phone: z.string().optional(),
-    location: z.string().optional(),
-    linkedin: z.string().optional(),
-    portfolio: z.string().optional()
+    name: z.preprocess(
+      (value) => (typeof value === "string" ? value.trim() : ""),
+      z.string()
+    ).transform((value) => value || "Unknown Candidate"),
+    email: z.preprocess(
+      (value) => (typeof value === "string" ? value.trim() : ""),
+      z.string()
+    ).transform((value) => value || "not-provided@example.com"),
+    phone: cleanOptionalString,
+    location: cleanOptionalString,
+    linkedin: cleanOptionalString,
+    portfolio: cleanOptionalString
   }),
   skills: z.array(
     z.object({
-      skillName: z.string().min(1),
-      category: z.string().min(1),
-      proficiency: z.enum(["beginner", "intermediate", "expert"])
+      skillName: z.preprocess(
+        (value) => (typeof value === "string" ? value.trim() : ""),
+        z.string()
+      ).transform((value) => value || "Unknown Skill"),
+      category: z.preprocess(
+        (value) => (typeof value === "string" ? value.trim() : "other"),
+        z.string()
+      ).transform((value) => value || "other"),
+      proficiency: proficiencySchema
     })
-  ),
+  ).default([]),
   experience: z.array(
     z.object({
-      company: z.string().min(1),
-      position: z.string().min(1),
-      startDate: z.string().min(1),
-      endDate: z.string().min(1),
-      description: z.string().min(1),
-      achievements: z.array(z.string().min(1))
+      company: z.preprocess(
+        (value) => (typeof value === "string" ? value.trim() : ""),
+        z.string()
+      ).transform((value) => value || "Not specified"),
+      position: z.preprocess(
+        (value) => (typeof value === "string" ? value.trim() : ""),
+        z.string()
+      ).transform((value) => value || "Not specified"),
+      startDate: z.preprocess(
+        (value) => (typeof value === "string" ? value.trim() : ""),
+        z.string()
+      ).transform((value) => value || "Not specified"),
+      endDate: z.preprocess(
+        (value) => (typeof value === "string" ? value.trim() : ""),
+        z.string()
+      ).transform((value) => value || "Not specified"),
+      description: z.preprocess(
+        (value) => (typeof value === "string" ? value.trim() : ""),
+        z.string()
+      ).transform((value) => value || "Not specified"),
+      achievements: stringList.default([])
     })
-  ),
+  ).default([]),
   education: z.array(
     z.object({
-      institution: z.string().min(1),
-      degree: z.string().min(1),
-      field: z.string().min(1),
-      graduationDate: z.string().min(1),
-      gpa: z.string().optional()
+      institution: z.preprocess(
+        (value) => (typeof value === "string" ? value.trim() : ""),
+        z.string()
+      ).transform((value) => value || "Not specified"),
+      degree: z.preprocess(
+        (value) => (typeof value === "string" ? value.trim() : ""),
+        z.string()
+      ).transform((value) => value || "Not specified"),
+      field: z.preprocess(
+        (value) => (typeof value === "string" ? value.trim() : ""),
+        z.string()
+      ).transform((value) => value || "Not specified"),
+      graduationDate: z.preprocess(
+        (value) => (typeof value === "string" ? value.trim() : ""),
+        z.string()
+      ).transform((value) => value || "Not specified"),
+      gpa: cleanOptionalString
     })
-  ),
+  ).default([]),
   certifications: z.array(
     z.object({
-      name: z.string().min(1),
-      issuer: z.string().min(1),
-      dateObtained: z.string().min(1),
-      expiryDate: z.string().optional()
+      name: z.preprocess(
+        (value) => (typeof value === "string" ? value.trim() : ""),
+        z.string()
+      ).transform((value) => value || "Not specified"),
+      issuer: z.preprocess(
+        (value) => (typeof value === "string" ? value.trim() : ""),
+        z.string()
+      ).transform((value) => value || "Not specified"),
+      dateObtained: z.preprocess(
+        (value) => (typeof value === "string" ? value.trim() : ""),
+        z.string()
+      ).transform((value) => value || "Not specified"),
+      expiryDate: cleanOptionalString
     })
-  ),
+  ).default([]),
   projects: z.array(
     z.object({
-      name: z.string().min(1),
-      description: z.string().min(1),
-      technologies: z.array(z.string().min(1)),
-      url: z.string().url().optional()
+      name: z.preprocess(
+        (value) => (typeof value === "string" ? value.trim() : ""),
+        z.string()
+      ).transform((value) => value || "Not specified"),
+      description: z.preprocess(
+        (value) => (typeof value === "string" ? value.trim() : ""),
+        z.string()
+      ).transform((value) => value || "Not specified"),
+      technologies: stringList.default([]),
+      url: optionalUrl
     })
-  )
+  ).default([])
 });
 
 export const createUserSchema = z.object({
@@ -66,10 +180,10 @@ export const createResumeSchema = z.object({
   userId: z.string().min(1),
   parsedData: parsedResumeDataSchema,
   aiAnalysis: z.object({
-    strengthAreas: z.array(z.string()),
-    improvementAreas: z.array(z.string()),
-    suggestedJobRoles: z.array(z.string()),
-    overallQuality: z.number().min(0).max(100)
+    strengthAreas: stringList.default([]),
+    improvementAreas: stringList.default([]),
+    suggestedJobRoles: stringList.default([]),
+    overallQuality: scoreSchema
   })
 });
 
