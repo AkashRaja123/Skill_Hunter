@@ -16,12 +16,18 @@ const ResumePreviewModal = dynamic(
   { ssr: false, loading: () => <ModalSkeleton /> }
 );
 
+const KnowledgeGraph = dynamic(
+  () => import("@/components/knowledge-graph"),
+  { ssr: false, loading: () => <ModalSkeleton /> }
+);
+
 export function DashboardPage() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [uploadedResume, setUploadedResume] = useState<{ id: string; name: string } | null>(null);
   const [parsedResults, setParsedResults] = useState<{ parsedData: ParsedResumeData; aiAnalysis: AIAnalysis } | null>(null);
   const [showModal, setShowModal] = useState(false);
+  const [showKnowledgeGraph, setShowKnowledgeGraph] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const handleFileSelect = async (file: File) => {
@@ -240,7 +246,7 @@ export function DashboardPage() {
                   {uploadedResume.name} has been successfully parsed and analyzed by AI.
                 </p>
 
-                <div className="mt-8">
+                <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
                   <button
                     onClick={() => setShowModal(true)}
                     className="inline-flex w-full items-center justify-center rounded-xl bg-blue-600 px-6 py-4 text-base font-bold text-white shadow-lg shadow-blue-500/30 transition hover:bg-blue-700 hover:shadow-blue-500/40 md:w-auto"
@@ -249,6 +255,15 @@ export function DashboardPage() {
                     <svg className="ml-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
                     </svg>
+                  </button>
+                  <button
+                    onClick={() => setShowKnowledgeGraph(true)}
+                    className="inline-flex w-full items-center justify-center rounded-xl bg-slate-900 px-6 py-4 text-base font-bold text-white shadow-lg shadow-slate-800/30 transition hover:bg-slate-800 hover:shadow-slate-800/40 md:w-auto"
+                  >
+                    <svg className="mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                    </svg>
+                    Knowledge Graph
                   </button>
                 </div>
               </div>
@@ -285,6 +300,14 @@ export function DashboardPage() {
                 onClose={() => setShowModal(false)} 
                 data={parsedResults} 
               />
+
+              {showKnowledgeGraph && parsedResults && (
+                <KnowledgeGraph
+                  parsedData={parsedResults.parsedData}
+                  aiAnalysis={parsedResults.aiAnalysis}
+                  onClose={() => setShowKnowledgeGraph(false)}
+                />
+              )}
             </div>
           )}
         </div>
