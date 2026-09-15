@@ -493,12 +493,12 @@ export function JobMatchingWizard({
                       <h4 className="text-sm font-semibold text-slate-900">Keywords to Add</h4>
                       <p className="mb-3 text-xs text-slate-500">Add these keywords to your resume to improve ATS compatibility.</p>
                       <div className="flex flex-wrap gap-2">
-                        {atsResult.resumeEnhancement.keywordsToAdd.map((kw, i) => (
+                        {Array.isArray(atsResult.resumeEnhancement.keywordsToAdd) && atsResult.resumeEnhancement.keywordsToAdd.map((kw, i) => (
                           <span key={i} className="rounded-full bg-indigo-50 px-3 py-1 text-xs font-medium text-indigo-700 border border-indigo-100">
                             {kw}
                           </span>
                         ))}
-                        {atsResult.resumeEnhancement.keywordsToAdd.length === 0 && (
+                        {(!Array.isArray(atsResult.resumeEnhancement.keywordsToAdd) || atsResult.resumeEnhancement.keywordsToAdd.length === 0) && (
                           <span className="text-xs text-slate-400 italic">No keywords suggested.</span>
                         )}
                       </div>
@@ -509,19 +509,19 @@ export function JobMatchingWizard({
                       <h4 className="text-sm font-semibold text-slate-900">Phrases to Use</h4>
                       <p className="mb-3 text-xs text-slate-500">Incorporate these action phrases into your resume sections.</p>
                       <div className="space-y-2">
-                        {atsResult.resumeEnhancement.phrasesToUse.map((phrase, i) => (
+                        {Array.isArray(atsResult.resumeEnhancement.phrasesToUse) && atsResult.resumeEnhancement.phrasesToUse.map((phrase, i) => (
                           <div key={i} className="rounded-lg border border-slate-100 bg-slate-50 px-4 py-2 text-xs text-slate-700 font-mono">
                             &ldquo;{phrase}&rdquo;
                           </div>
                         ))}
-                        {atsResult.resumeEnhancement.phrasesToUse.length === 0 && (
+                        {(!Array.isArray(atsResult.resumeEnhancement.phrasesToUse) || atsResult.resumeEnhancement.phrasesToUse.length === 0) && (
                           <span className="text-xs text-slate-400 italic">No phrases suggested.</span>
                         )}
                       </div>
                     </div>
 
                     {/* Sections to Update */}
-                    {atsResult.resumeEnhancement.sectionsToUpdate.length > 0 && (
+                    {Array.isArray(atsResult.resumeEnhancement.sectionsToUpdate) && atsResult.resumeEnhancement.sectionsToUpdate.length > 0 && (
                       <div className="rounded-xl border border-slate-200 bg-white p-5">
                         <h4 className="text-sm font-semibold text-slate-900">Sections to Update</h4>
                         <ul className="mt-2 space-y-1.5 text-xs text-slate-600">
@@ -590,7 +590,7 @@ export function JobMatchingWizard({
                     <div className="rounded-xl border border-slate-200 bg-white p-5">
                       <h4 className="text-sm font-semibold text-slate-900">Missing Skills</h4>
                       <p className="mb-3 text-xs text-slate-500">Skills required by this job that you should develop.</p>
-                      {atsResult.skillsGap.missingSkills.length > 0 ? (
+                      {Array.isArray(atsResult.skillsGap.missingSkills) && atsResult.skillsGap.missingSkills.length > 0 ? (
                         <div className="space-y-2">
                           {atsResult.skillsGap.missingSkills.map((ms, i) => (
                             <div key={i} className="flex items-center justify-between rounded-lg border border-slate-100 bg-slate-50 px-4 py-2.5">
