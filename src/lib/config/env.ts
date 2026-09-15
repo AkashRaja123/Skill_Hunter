@@ -6,6 +6,7 @@ const envSchema = z.object({
   OPENROUTER_API_KEY: z.string().min(1, "OPENROUTER_API_KEY is required for resume parsing"),
   OPENROUTER_SITE_URL: z.string().url().optional(),
   OPENROUTER_APP_NAME: z.string().optional(),
+  NEWSAPI_KEY: z.string().optional(),
   FIREBASE_PROJECT_ID: z.string().optional(),
   FIREBASE_CLIENT_EMAIL: z.string().optional(),
   FIREBASE_PRIVATE_KEY: z.string().optional(),
@@ -24,5 +25,6 @@ export const env = {
   useFirebase: parsed.data.USE_FIREBASE === "true",
   openRouterApiKey: parsed.data.OPENROUTER_API_KEY,
   openRouterSiteUrl: parsed.data.OPENROUTER_SITE_URL,
-  openRouterAppName: parsed.data.OPENROUTER_APP_NAME ?? "Skill Hunter"
+  openRouterAppName: parsed.data.OPENROUTER_APP_NAME ?? "Skill Hunter",
+  newsApiKey: parsed.data.NEWSAPI_KEY
 };

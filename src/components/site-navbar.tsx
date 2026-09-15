@@ -6,6 +6,8 @@ import { useEffect, useState } from "react";
 import { BrandLogo } from "@/components/brand-logo";
 
 const links = [
+  { href: "/tech-dashboard", label: "Today's Tech 🚀" },
+  { href: "/tech-news", label: "All News 📰" },
   { href: "#features", label: "Features" },
   { href: "#how-it-works", label: "How It Works" },
   { href: "#pricing", label: "Pricing" },
