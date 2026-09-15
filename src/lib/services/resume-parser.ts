@@ -95,65 +95,77 @@ export async function parseResumeWithOpenRouter(resumeText: string): Promise<{
   parsedData: ParsedResumeData;
   aiAnalysis: AIAnalysis;
 }> {
-  try {
-    const response = await fetch(OPENROUTER_API_URL, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${env.openRouterApiKey}`,
-        "Content-Type": "application/json",
-        "HTTP-Referer": env.openRouterSiteUrl ?? "http://localhost:3000",
-        "X-Title": env.openRouterAppName
-      },
-      body: JSON.stringify({
-        model: env.openRouterModel,
-        messages: [
-          {
-            role: "system",
-            content: PARSING_PROMPT
-          },
-          {
-            role: "user",
-            content: resumeText
-          }
-        ],
-        temperature: 0.2,
-        top_p: 0.95,
-        max_tokens: 4096
-      })
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(`OpenRouter API error: ${JSON.stringify(errorData)}`);
-    }
-
-    const data: OpenRouterResponse = await response.json();
-    const generatedText = data.choices?.[0]?.message?.content;
-
-    if (!generatedText) {
-      throw new Error("No response from OpenRouter API");
-    }
-
-    // Extract JSON from markdown code blocks if present
-    let jsonText = generatedText.trim();
-    if (jsonText.startsWith("```json")) {
-      jsonText = jsonText.replace(/```json\n?/, "").replace(/\n?```$/, "");
-    } else if (jsonText.startsWith("```")) {
-      jsonText = jsonText.replace(/```\n?/, "").replace(/\n?```$/, "");
-    }
-
-    const parsed = JSON.parse(jsonText);
-
-    return {
-      parsedData: parsed.parsedData,
-      aiAnalysis: parsed.aiAnalysis
-    };
-  } catch (error) {
-    console.error("Resume parsing error:", error);
-    throw new Error(
-      error instanceof Error ? `Failed to parse resume: ${error.message}` : "Failed to parse resume"
-    );
+  const modelsToTry = [env.openRouterModel];
+  if (env.openRouterFallbackModel) {
+    modelsToTry.push(env.openRouterFallbackModel);
   }
+
+  let lastError: Error | null = null;
+
+  for (const model of modelsToTry) {
+    try {
+      const response = await fetch(OPENROUTER_API_URL, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${env.openRouterApiKey}`,
+          "Content-Type": "application/json",
+          "HTTP-Referer": env.openRouterSiteUrl ?? "http://localhost:3000",
+          "X-Title": env.openRouterAppName
+        },
+        body: JSON.stringify({
+          model: model,
+          messages: [
+            {
+              role: "system",
+              content: PARSING_PROMPT
+            },
+            {
+              role: "user",
+              content: resumeText
+            }
+          ],
+          temperature: 0.2,
+          top_p: 0.95,
+          max_tokens: 4096
+        })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(`OpenRouter API error with model ${model}: ${JSON.stringify(errorData)}`);
+      }
+
+      const data: OpenRouterResponse = await response.json();
+      const generatedText = data.choices?.[0]?.message?.content;
+
+      if (!generatedText) {
+        throw new Error(`No response from OpenRouter API using model ${model}`);
+      }
+
+      // Extract JSON from markdown code blocks if present
+      let jsonText = generatedText.trim();
+      if (jsonText.startsWith("```json")) {
+        jsonText = jsonText.replace(/```json\n?/, "").replace(/\n?```$/, "");
+      } else if (jsonText.startsWith("```")) {
+        jsonText = jsonText.replace(/```\n?/, "").replace(/\n?```$/, "");
+      }
+
+      const parsed = JSON.parse(jsonText);
+
+      return {
+        parsedData: parsed.parsedData,
+        aiAnalysis: parsed.aiAnalysis
+      };
+    } catch (error) {
+      console.warn(`[Resume Parser] Failed with model ${model}:`, error);
+      lastError = error instanceof Error ? error : new Error(String(error));
+      // Continue to the next model in the loop
+    }
+  }
+
+  throw new Error(
+    lastError ? `Failed to parse resume after all fallbacks. Last error: ${lastError.message}` : "Failed to parse resume"
+  );
 }
 
 export async function extractTextFromPDF(arrayBuffer: ArrayBuffer): Promise<string> {

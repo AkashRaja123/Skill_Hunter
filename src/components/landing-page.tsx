@@ -256,7 +256,7 @@ export function LandingPage() {
           <div className="mt-8 grid gap-5 lg:grid-cols-3">
             <article className="card p-6">
               <h3 className="font-heading text-xl font-semibold">Basic</h3>
-              <p className="mt-3 text-3xl font-bold">$29</p>
+              <p className="mt-3 text-3xl font-bold">$0</p>
               <ul className="mt-4 space-y-2 text-sm text-slate-600">
                 <li>Parsed resume storage</li>
                 <li>10 ATS score reports</li>
@@ -270,7 +270,7 @@ export function LandingPage() {
             <article className="card relative border-2 border-[var(--primary)] bg-blue-50 p-6">
               <span className="pill absolute -top-3 left-6 bg-[var(--primary)] px-3 py-1 text-xs font-semibold text-white">Most Popular</span>
               <h3 className="font-heading text-xl font-semibold">Pro</h3>
-              <p className="mt-3 text-3xl font-bold">$79</p>
+              <p className="mt-3 text-3xl font-bold">$20</p>
               <ul className="mt-4 space-y-2 text-sm text-slate-600">
                 <li>Unlimited ATS reports</li>
                 <li>Versioned optimization history</li>

@@ -77,67 +77,86 @@ ${jobTitle}
 ${jobDescription}
 `;
 
-  const response = await fetch(OPENROUTER_API_URL, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${env.openRouterApiKey}`,
-      "Content-Type": "application/json",
-      "HTTP-Referer": env.openRouterSiteUrl ?? "http://localhost:3000",
-      "X-Title": env.openRouterAppName
-    },
-    body: JSON.stringify({
-      model: env.openRouterModel,
-      messages: [
-        { role: "system", content: ATS_ANALYSIS_PROMPT },
-        { role: "user", content: userContent }
-      ],
-      temperature: 0.2,
-      top_p: 0.95,
-      max_tokens: 4096
-    })
-  });
-
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(`OpenRouter API error: ${JSON.stringify(errorData)}`);
+  const modelsToTry = [env.openRouterModel];
+  if (env.openRouterFallbackModel) {
+    modelsToTry.push(env.openRouterFallbackModel);
   }
 
-  const data: OpenRouterResponse = await response.json();
-  const generatedText = data.choices?.[0]?.message?.content;
+  let lastError: Error | null = null;
 
-  if (!generatedText) {
-    throw new Error("No response from OpenRouter API for ATS analysis");
-  }
+  for (const model of modelsToTry) {
+    try {
+      const response = await fetch(OPENROUTER_API_URL, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${env.openRouterApiKey}`,
+          "Content-Type": "application/json",
+          "HTTP-Referer": env.openRouterSiteUrl ?? "http://localhost:3000",
+          "X-Title": env.openRouterAppName
+        },
+        body: JSON.stringify({
+          model: model,
+          messages: [
+            { role: "system", content: ATS_ANALYSIS_PROMPT },
+            { role: "user", content: userContent }
+          ],
+          temperature: 0.2,
+          top_p: 0.95,
+          max_tokens: 4096
+        })
+      });
 
-  let jsonText = generatedText.trim();
-  if (jsonText.startsWith("```json")) {
-    jsonText = jsonText.replace(/```json\n?/, "").replace(/\n?```$/, "");
-  } else if (jsonText.startsWith("```")) {
-    jsonText = jsonText.replace(/```\n?/, "").replace(/\n?```$/, "");
-  }
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(`OpenRouter API error with model ${model}: ${JSON.stringify(errorData)}`);
+      }
 
-  const parsed = JSON.parse(jsonText);
-  const score = typeof parsed.score === "number" ? parsed.score : 0;
+      const data: OpenRouterResponse = await response.json();
+      const generatedText = data.choices?.[0]?.message?.content;
 
-  return {
-    score,
-    passedThreshold: score >= 85,
-    scoreBreakdown: parsed.scoreBreakdown ?? {
-      keywordMatch: 0,
-      formatCompliance: 0,
-      experienceMatch: 0,
-      skillsMatch: 0,
-      educationMatch: 0
-    },
-    suggestions: parsed.suggestions ?? [],
-    resumeEnhancement: {
-      keywordsToAdd: parsed.resumeEnhancement?.keywordsToAdd ?? [],
-      phrasesToUse: parsed.resumeEnhancement?.phrasesToUse ?? [],
-      sectionsToUpdate: parsed.resumeEnhancement?.sectionsToUpdate ?? []
-    },
-    skillsGap: {
-      missingSkills: parsed.skillsGap?.missingSkills ?? [],
-      timeToLearn: parsed.skillsGap?.timeToLearn
+      if (!generatedText) {
+        throw new Error(`No response from OpenRouter API using model ${model}`);
+      }
+
+      let jsonText = generatedText.trim();
+      if (jsonText.startsWith("```json")) {
+        jsonText = jsonText.replace(/```json\n?/, "").replace(/\n?```$/, "");
+      } else if (jsonText.startsWith("```")) {
+        jsonText = jsonText.replace(/```\n?/, "").replace(/\n?```$/, "");
+      }
+
+      const parsed = JSON.parse(jsonText);
+      const score = typeof parsed.score === "number" ? parsed.score : 0;
+
+      return {
+        score,
+        passedThreshold: score >= 85,
+        scoreBreakdown: parsed.scoreBreakdown ?? {
+          keywordMatch: 0,
+          formatCompliance: 0,
+          experienceMatch: 0,
+          skillsMatch: 0,
+          educationMatch: 0
+        },
+        suggestions: parsed.suggestions ?? [],
+        resumeEnhancement: {
+          keywordsToAdd: parsed.resumeEnhancement?.keywordsToAdd ?? [],
+          phrasesToUse: parsed.resumeEnhancement?.phrasesToUse ?? [],
+          sectionsToUpdate: parsed.resumeEnhancement?.sectionsToUpdate ?? []
+        },
+        skillsGap: {
+          missingSkills: parsed.skillsGap?.missingSkills ?? [],
+          timeToLearn: parsed.skillsGap?.timeToLearn
+        }
+      };
+    } catch (error) {
+      console.warn(`[ATS Analyzer] Failed with model ${model}:`, error);
+      lastError = error instanceof Error ? error : new Error(String(error));
+      // Continue to the next model
     }
-  };
+  }
+
+  throw new Error(
+    lastError ? `Failed ATS analysis after all fallbacks. Last error: ${lastError.message}` : "Failed ATS analysis"
+  );
 }
