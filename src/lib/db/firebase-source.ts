@@ -63,4 +63,8 @@ export class FirebaseDataSource implements DataSource {
   async createApplication(_input: Application): Promise<Application> {
     FirebaseDataSource.notReady();
   }
+
+  async updateApplication(_applicationId: string, _updates: Partial<Application>): Promise<Application> {
+    FirebaseDataSource.notReady();
+  }
 }

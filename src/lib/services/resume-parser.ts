@@ -2,7 +2,6 @@ import { env } from "@/lib/config/env";
 import type { ParsedResumeData, AIAnalysis } from "@/lib/db/types";
 
 const OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions";
-const OPENROUTER_MODEL = "qwen/qwen3-vl-30b-a3b-thinking";
 
 interface OpenRouterResponse {
   choices?: Array<{
@@ -12,7 +11,11 @@ interface OpenRouterResponse {
   }>;
 }
 
-const PARSING_PROMPT = `You are an expert resume parser. Extract structured data from the following resume text and return ONLY a valid JSON object with this exact structure:
+const PARSING_PROMPT = `You are an expert resume parser and career analyst.
+
+Your task is to analyze the provided resume text, extract structured information, and determine the most suitable job roles for the candidate.
+
+Return ONLY a valid JSON object with this exact structure:
 
 {
   "parsedData": {
@@ -71,23 +74,22 @@ const PARSING_PROMPT = `You are an expert resume parser. Extract structured data
     "strengthAreas": ["string"],
     "improvementAreas": ["string"],
     "suggestedJobRoles": ["string"],
+    "bestSuitableRole": "string",
+    "roleJustification": "string",
     "overallQuality": number between 0-100
   }
 }
 
 Rules:
-- Return ONLY valid JSON, no markdown, no explanations
-- If a field is missing, use empty string or empty array
-- Infer proficiency levels based on context (years of experience, role seniority)
-- Extract all skills mentioned (technical, soft, languages)
-- For achievements, extract bullet points from experience sections
-- For overallQuality, score based on: clarity, completeness, impact statements, formatting
-- strengthAreas should highlight what stands out positively
-- improvementAreas should note missing elements or weak points
-- suggestedJobRoles should list 3-5 best-fit roles based on skills and experience
-
-Resume text:
-`;
+- Return ONLY valid JSON (no markdown, no explanations).
+- If a field is missing, use an empty string "" or empty array [].
+- Extract all skills mentioned, including technical, soft, and language skills.
+- Infer skill proficiency based on experience, role titles, and context.
+- Extract bullet points from experience sections as achievements.
+- Identify 3–5 suggestedJobRoles based on skills, projects, and experience.
+- Determine the single most suitable role in "bestSuitableRole".
+- Provide a short explanation in "roleJustification" explaining why this role fits the candidate.
+- Score "overallQuality" from 0–100 based on clarity, completeness, measurable achievements, and formatting.`;
 
 export async function parseResumeWithOpenRouter(resumeText: string): Promise<{
   parsedData: ParsedResumeData;
@@ -103,11 +105,15 @@ export async function parseResumeWithOpenRouter(resumeText: string): Promise<{
         "X-Title": env.openRouterAppName
       },
       body: JSON.stringify({
-        model: OPENROUTER_MODEL,
+        model: env.openRouterModel,
         messages: [
           {
+            role: "system",
+            content: PARSING_PROMPT
+          },
+          {
             role: "user",
-            content: `${PARSING_PROMPT}${resumeText}`
+            content: resumeText
           }
         ],
         temperature: 0.2,

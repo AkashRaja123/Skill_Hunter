@@ -1,5 +1,6 @@
 export type Id = string;
 export type Timestamp = string;
+export type UserRole = "job_seeker" | "hr_recruiter";
 
 export interface UserMetadata {
   totalResumesUploaded: number;
@@ -11,6 +12,8 @@ export interface User {
   userId: Id;
   email: string;
   displayName: string;
+  role: UserRole;
+  isJobSeeker: boolean;
   createdAt: Timestamp;
   lastLoginAt: Timestamp;
   profileComplete: boolean;
@@ -194,9 +197,50 @@ export interface Application {
   followUpDate?: Timestamp;
 }
 
+export interface JobSearchResult {
+  id: string;
+  title: string;
+  company: string;
+  location: string;
+  description: string;
+  salaryMin?: number;
+  salaryMax?: number;
+  jobType?: string;
+  jobUrl?: string;
+  postedDate?: string;
+}
+
+export interface MissingSkill {
+  skill: string;
+  importance: "critical" | "recommended" | "nice-to-have";
+}
+
+export interface ATSAnalysisResult {
+  score: number;
+  passedThreshold: boolean;
+  scoreBreakdown: {
+    keywordMatch: number;
+    formatCompliance: number;
+    experienceMatch: number;
+    skillsMatch: number;
+    educationMatch: number;
+  };
+  suggestions: ATSSuggestion[];
+  resumeEnhancement: {
+    keywordsToAdd: string[];
+    phrasesToUse: string[];
+    sectionsToUpdate: string[];
+  };
+  skillsGap: {
+    missingSkills: MissingSkill[];
+    timeToLearn?: string;
+  };
+}
+
 export interface ListFilters {
   userId?: string;
   resumeId?: string;
   jobMatchId?: string;
   status?: string;
+  email?: string;
 }
