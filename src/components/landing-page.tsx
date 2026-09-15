@@ -267,25 +267,25 @@ export function LandingPage() {
       <section id="pricing" className="section-pad">
         <div className="container-shell">
           <h2 className="text-center font-heading text-3xl font-bold text-slate-950 md:text-4xl">Simple, Transparent Pricing</h2>
-          <p className="mt-2 text-center text-sm text-slate-500">[Insert Your Pricing Here]</p>
+          <p className="mt-2 text-center text-sm text-slate-500">Choose the plan that fits your career search goals</p>
           <div className="mt-8 grid gap-5 lg:grid-cols-3">
             <article className="card p-6">
-              <h3 className="font-heading text-xl font-semibold">Basic</h3>
-              <p className="mt-3 text-3xl font-bold">$0</p>
+              <h3 className="font-heading text-xl font-semibold">Starter</h3>
+              <p className="mt-3 text-3xl font-bold">₹199</p>
               <ul className="mt-4 space-y-2 text-sm text-slate-600">
-                <li>Parsed resume storage</li>
                 <li>10 ATS score reports</li>
+                <li>Basic Skill Gap Analysis</li>
                 <li>Job match feed</li>
                 <li>Email support</li>
               </ul>
-              <Link href="#final-cta" className="pill mt-6 inline-flex border border-slate-300 px-5 py-2.5 text-sm font-semibold">
-                Choose Basic
+              <Link href="/payment" className="pill mt-6 inline-flex border border-slate-300 px-5 py-2.5 text-sm font-semibold hover:border-slate-400">
+                Choose Starter
               </Link>
             </article>
             <article className="card relative border-2 border-[var(--primary)] bg-blue-50 p-6">
               <span className="pill absolute -top-3 left-6 bg-[var(--primary)] px-3 py-1 text-xs font-semibold text-white">Most Popular</span>
               <h3 className="font-heading text-xl font-semibold">Pro</h3>
-              <p className="mt-3 text-3xl font-bold">$20</p>
+              <p className="mt-3 text-3xl font-bold">₹499</p>
               <ul className="mt-4 space-y-2 text-sm text-slate-600">
                 <li>Unlimited ATS reports</li>
                 <li>Versioned optimization history</li>
@@ -294,10 +294,10 @@ export function LandingPage() {
                 <li>Advanced analytics</li>
               </ul>
               <Link
-                href="#final-cta"
-                className="pill mt-6 inline-flex bg-[var(--primary)] px-5 py-2.5 text-sm font-semibold text-white shadow-glow"
+                href="/payment"
+                className="pill mt-6 inline-flex bg-[var(--primary)] px-5 py-2.5 text-sm font-semibold text-white shadow-glow hover:brightness-110"
               >
-                Choose Pro
+                Upgrade to Pro (Razorpay)
               </Link>
             </article>
             <article className="card p-6">

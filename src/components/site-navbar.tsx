@@ -19,6 +19,7 @@ const publicLinks = [
 const jobSeekerLinks = [
   { href: "/dashboard", label: "Dashboard" },
   { href: "/prep", label: "Prep" },
+  { href: "/payment", label: "Upgrade" },
   { href: "/news", label: "News" },
   { href: "/#features", label: "Features" },
   { href: "/#how-it-works", label: "How It Works" },
@@ -29,6 +30,7 @@ const jobSeekerLinks = [
 
 const hrLinks = [
   { href: "/dashboard", label: "Dashboard" },
+  { href: "/payment", label: "Upgrade" },
   { href: "/news", label: "News" },
   { href: "/#features", label: "Features" },
   { href: "/#how-it-works", label: "How It Works" },

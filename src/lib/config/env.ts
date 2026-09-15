@@ -14,7 +14,10 @@ const envSchema = z.object({
   FIREBASE_PROJECT_ID: z.string().optional(),
   FIREBASE_CLIENT_EMAIL: z.string().optional(),
   FIREBASE_PRIVATE_KEY: z.string().optional(),
-  FIREBASE_STORAGE_BUCKET: z.string().optional()
+  FIREBASE_STORAGE_BUCKET: z.string().optional(),
+  NEXT_PUBLIC_RAZORPAY_KEY_ID: z.string().optional(),
+  RAZORPAY_KEY_SECRET: z.string().optional(),
+  PAYMENT_PROVIDER: z.string().default("razorpay")
 });
 
 const parsed = envSchema.safeParse(process.env);
@@ -34,5 +37,8 @@ export const env = {
   openRouterAppName: parsed.data.OPENROUTER_APP_NAME ?? "Skill Hunter",
   adzunaAppId: parsed.data.ADZUNA_APP_ID,
   adzunaAppKey: parsed.data.ADZUNA_APP_KEY,
-  newsApiKey: parsed.data.NEWS_API_KEY
+  newsApiKey: parsed.data.NEWS_API_KEY,
+  razorpayKeyId: parsed.data.NEXT_PUBLIC_RAZORPAY_KEY_ID || process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || "",
+  razorpayKeySecret: parsed.data.RAZORPAY_KEY_SECRET || process.env.RAZORPAY_KEY_SECRET || "",
+  paymentProvider: parsed.data.PAYMENT_PROVIDER
 };
