@@ -7,6 +7,7 @@ import { BrandLogo } from "@/components/brand-logo";
 import { useAuth } from "@/context/auth-context";
 
 const publicLinks = [
+  { href: "/prep", label: "Prep" },
   { href: "/news", label: "News" },
   { href: "/#features", label: "Features" },
   { href: "/#how-it-works", label: "How It Works" },
@@ -17,6 +18,7 @@ const publicLinks = [
 
 const jobSeekerLinks = [
   { href: "/dashboard", label: "Dashboard" },
+  { href: "/prep", label: "Prep" },
   { href: "/news", label: "News" },
   { href: "/#features", label: "Features" },
   { href: "/#how-it-works", label: "How It Works" },
@@ -93,15 +95,23 @@ export function SiteNavbar() {
         </div>
         {!loading && user ? (
           <div className="flex items-center gap-2 md:hidden">
+            {role !== "hr_recruiter" && (
+              <Link
+                href="/prep"
+                className="pill border border-[var(--line)] bg-white px-3 py-1.5 text-xs font-semibold text-slate-700"
+              >
+                Prep
+              </Link>
+            )}
             <Link
               href="/news"
-              className="pill border border-[var(--line)] bg-white px-4 py-2 text-sm font-semibold text-slate-700"
+              className="pill border border-[var(--line)] bg-white px-3 py-1.5 text-xs font-semibold text-slate-700"
             >
               News
             </Link>
             <Link
               href="/dashboard"
-              className="pill bg-[var(--primary)] px-4 py-2 text-sm font-semibold text-white"
+              className="pill bg-[var(--primary)] px-3 py-1.5 text-xs font-semibold text-white"
             >
               Dashboard
             </Link>
@@ -109,14 +119,20 @@ export function SiteNavbar() {
         ) : (
           <div className="flex items-center gap-2 md:hidden">
             <Link
+              href="/prep"
+              className="pill border border-[var(--line)] bg-white px-3 py-1.5 text-xs font-semibold text-slate-700"
+            >
+              Prep
+            </Link>
+            <Link
               href="/news"
-              className="pill border border-[var(--line)] bg-white px-4 py-2 text-sm font-semibold text-slate-700"
+              className="pill border border-[var(--line)] bg-white px-3 py-1.5 text-xs font-semibold text-slate-700"
             >
               News
             </Link>
             <Link
               href="/auth"
-              className="pill bg-[var(--primary)] px-4 py-2 text-sm font-semibold text-white"
+              className="pill bg-[var(--primary)] px-3 py-1.5 text-xs font-semibold text-white"
             >
               Start
             </Link>

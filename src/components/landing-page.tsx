@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 
 import { BrandLogo } from "@/components/brand-logo";
 
@@ -227,10 +228,24 @@ export function LandingPage() {
       </section>
 
       <section className="section-pad bg-white/80">
-        <div className="container-shell grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
-          <div className="card min-h-[320px] overflow-hidden p-6">
-            <p className="text-sm font-semibold text-slate-700">Visual Demo Placeholder</p>
-            <div className="mt-5 h-[250px] rounded-2xl border border-slate-200 bg-gradient-to-br from-slate-950 to-slate-700" />
+        <div className="container-shell grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
+          <div className="card overflow-hidden p-4 sm:p-6 bg-white border border-slate-200/90 shadow-lg shadow-slate-100/80 rounded-2xl flex flex-col justify-center">
+            <div className="flex items-center justify-between pb-3 mb-3 border-b border-slate-100">
+              <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">Skill Hunter Architecture</span>
+              <span className="inline-flex items-center rounded-full bg-emerald-50 px-2.5 py-0.5 text-xs font-medium text-emerald-700">
+                End-to-End Workflow
+              </span>
+            </div>
+            <div className="relative flex items-center justify-center rounded-xl bg-slate-50/50 p-2 sm:p-4 border border-slate-100">
+              <Image
+                src="/workflow.png"
+                alt="Skill Hunter Workflow Diagram"
+                width={700}
+                height={950}
+                className="w-full max-w-[480px] h-auto object-contain rounded-lg shadow-sm"
+                priority
+              />
+            </div>
           </div>
           <div className="space-y-4">
             <h2 className="font-heading text-3xl font-bold text-slate-950">See The Workflow In Action</h2>

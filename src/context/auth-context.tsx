@@ -18,6 +18,7 @@ import {
 } from "firebase/auth";
 import { doc, setDoc, getDoc } from "firebase/firestore";
 import { auth, db } from "@/lib/firebase/config";
+import { clearAllSessions } from "@/lib/utils/session-storage";
 import type { UserRole } from "@/lib/db/types";
 
 interface AuthContextValue {
@@ -115,6 +116,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     async function signOut() {
         await firebaseSignOut(auth);
         setRoleState(null);
+        clearAllSessions();
     }
 
     return (

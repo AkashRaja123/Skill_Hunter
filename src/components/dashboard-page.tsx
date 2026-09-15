@@ -2,11 +2,12 @@
 
 import Link from "next/link";
 import dynamic from "next/dynamic";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { FileUploadBox } from "@/components/file-upload-box";
 import { ModalSkeleton } from "@/components/loading-skeletons";
 import { SiteNavbar } from "@/components/site-navbar";
+import { getSession, setSession, removeSession, SESSION_KEYS } from "@/lib/utils/session-storage";
 import type { AIAnalysis, ParsedResumeData } from "@/lib/db/types";
 
 // ResumePreviewModal is a large component (contains the Job Matching Wizard).
@@ -29,6 +30,17 @@ export function DashboardPage() {
   const [showModal, setShowModal] = useState(false);
   const [showKnowledgeGraph, setShowKnowledgeGraph] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Hydrate state from sessionStorage on mount
+  useEffect(() => {
+    const cachedResults = getSession<{ parsedData: ParsedResumeData; aiAnalysis: AIAnalysis }>(SESSION_KEYS.PARSED_RESULTS);
+    const cachedResume = getSession<{ id: string; name: string }>(SESSION_KEYS.UPLOADED_RESUME);
+
+    if (cachedResults && cachedResume) {
+      setParsedResults(cachedResults);
+      setUploadedResume(cachedResume);
+    }
+  }, []);
 
   const handleFileSelect = async (file: File) => {
     setSelectedFile(file);
@@ -55,10 +67,14 @@ export function DashboardPage() {
         throw new Error(result.error || "Failed to parse resume");
       }
 
-      setParsedResults({
+      const results = {
         parsedData: result.data.parsedData,
         aiAnalysis: result.data.aiAnalysis
-      });
+      };
+      setParsedResults(results);
+
+      // Persist to sessionStorage
+      setSession(SESSION_KEYS.PARSED_RESULTS, results);
 
       // Save parsed resume to backend
       const saveResponse = await fetch("/api/resumes", {
@@ -79,11 +95,15 @@ export function DashboardPage() {
         throw new Error(savedResume.error || "Failed to save resume");
       }
 
-      setUploadedResume({
+      const resumeInfo = {
         id: savedResume.data.resumeId,
         name: file.name
-      });
+      };
+      setUploadedResume(resumeInfo);
       setShowModal(true);
+
+      // Persist to sessionStorage
+      setSession(SESSION_KEYS.UPLOADED_RESUME, resumeInfo);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to process resume");
       setSelectedFile(null);
@@ -264,6 +284,24 @@ export function DashboardPage() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
                     </svg>
                     Knowledge Graph
+                  </button>
+                  <button
+                    onClick={() => {
+                      setParsedResults(null);
+                      setUploadedResume(null);
+                      setSelectedFile(null);
+                      removeSession(SESSION_KEYS.PARSED_RESULTS);
+                      removeSession(SESSION_KEYS.UPLOADED_RESUME);
+                      removeSession(SESSION_KEYS.ATS_RESULTS);
+                      removeSession(SESSION_KEYS.MATCHED_JOBS);
+                      removeSession(SESSION_KEYS.SELECTED_JOB);
+                    }}
+                    className="inline-flex w-full items-center justify-center rounded-xl border-2 border-slate-200 bg-white px-6 py-4 text-base font-bold text-slate-700 shadow-sm transition hover:border-slate-400 hover:bg-slate-50 md:w-auto"
+                  >
+                    <svg className="mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                    New Resume
                   </button>
                 </div>
               </div>

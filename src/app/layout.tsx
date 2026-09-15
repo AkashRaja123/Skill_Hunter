@@ -19,7 +19,18 @@ export const metadata: Metadata = {
   title: "Skill Hunter | ATS Resume Optimization",
   description:
     "Skill Hunter helps teams and job seekers optimize resumes with parsed data, ATS scoring, and guided job-match workflows.",
-  metadataBase: new URL("http://localhost:3000")
+  metadataBase: new URL("http://localhost:3000"),
+  icons: {
+    icon: [
+      { url: "/favicon.ico" },
+      { url: "/favicon.svg", type: "image/svg+xml" },
+      { url: "/favicon-96x96.png", sizes: "96x96", type: "image/png" }
+    ],
+    apple: [
+      { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }
+    ]
+  },
+  manifest: "/site.webmanifest"
 };
 
 export default function RootLayout({
